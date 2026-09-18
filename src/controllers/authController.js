@@ -24,7 +24,7 @@ export async function register(req, res) {
 
     if (usuarioExiste) {
       return res.status(400).json({
-        mensagem: "E-mail já cadastrado"
+        message: "E-mail já cadastrado"
       });
     }
 
@@ -51,8 +51,7 @@ export async function register(req, res) {
       usuario: {
         id: usuario.id,
         name: usuario.name,
-        email: usuario.email,
-        password: usuario.senhaHash
+        email: usuario.email
       }
     });
   } catch (error) {
@@ -82,7 +81,7 @@ export async function login(req, res) {
 
     if (!usuario) {
       return res.status(401).json({
-        mensagem: "E-mail ou senha inválidos"
+        message: "E-mail ou senha inválidos"
       });
     }
 
@@ -93,7 +92,7 @@ export async function login(req, res) {
 
     if (!senhaValida) {
       return res.status(401).json({
-        mensagem: "E-mail ou senha inválidos"
+        message: "E-mail ou senha inválidos"
       });
     }
 
@@ -110,24 +109,14 @@ export async function login(req, res) {
       }
     );
 
-    // TODO: gerar token JWT com o id do usuário
-    // Dica: use jwt.sign, JWT_SECRET e JWT_EXPIRES_IN.
-
-    // TODO: retornar token e dados do usuário
-
     return res.status(200).json({
       message: "Login realizado com sucesso",
       token: token,
       usuario: {
         id: usuario.id,
         name: usuario.name,
-        email: usuario.email,
-        password: usuario.password
+        email: usuario.email
       }
-    });
-
-    return res.status(501).json({
-      message: "Login ainda será implementado pelos alunos"
     });
   } catch (error) {
     console.error("Erro no login:", error);

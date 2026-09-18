@@ -41,9 +41,17 @@ export default async function authMiddleware(req, res, next) {
     });
   }
 
-  // TODO: validar o token usando jwt.verify
+  let decoded;
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return res.status(401).json({
+      message: error.name === "TokenExpiredError"
+        ? "Token expirado"
+        : "Token inválido"
+    });
+  }
 
   // TODO: buscar o usuário no banco pelo id que veio no token
   const usuario = await prisma.user.findUnique({

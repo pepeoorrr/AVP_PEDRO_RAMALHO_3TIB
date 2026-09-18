@@ -6,7 +6,7 @@ Este projeto é uma base para a aula prática de Desenvolvimento de Sistemas Web
 
 **cadastro → hash de senha → login → sessão/token → middleware → rota protegida**
 
-As partes principais da autenticação contêm `TODOs`. Elas não estão prontas: serão implementadas pelos alunos durante a aula e depois poderão ser adaptadas aos projetos de TCC.
+O projeto implementa o fluxo de autenticação e possui um frontend React integrado à API.
 
 ## 2. Tecnologias usadas
 
@@ -153,7 +153,7 @@ Depois de completar o login, envie o token no cabeçalho:
 Authorization: Bearer SEU_TOKEN_AQUI
 ```
 
-Enquanto os `TODOs` não forem completados, cadastro, login e middleware respondem com status `501`, indicando que são exercícios ainda não implementados.
+O frontend usa `/login` para autenticação e `/perfil` para consultar a rota protegida. O backend valida o JWT em cada requisição a `/users/profile`.
 
 ## 10. O que é hash de senha?
 
