@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "description": "Template didático de autenticação para a disciplina de Desenvolvimento de Sistemas Web",
   "type": "module",
-  "main": "src/server.js",
+  "main": "backend/src/server.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "prisma db seed",
-    "prisma:studio": "prisma studio"
+    "dev": "nodemon backend/src/server.js",
+    "start": "node backend/src/server.js",
+    "prisma:migrate": "prisma --schema=backend/prisma/schema.prisma migrate dev",
+    "prisma:seed": "prisma --schema=backend/prisma/schema.prisma db seed",
+    "prisma:studio": "prisma --schema=backend/prisma/schema.prisma studio"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node backend/prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^6.13.0",

@@ -18,4 +18,18 @@ app.get("/health", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 
+app.use((req, res) => {
+  return res.status(404).json({
+    message: "Rota não encontrada",
+  });
+});
+
+app.use((error, req, res, next) => {
+  console.error("Erro não tratado:", error);
+
+  return res.status(500).json({
+    message: "Erro interno do servidor",
+  });
+});
+
 export default app;

@@ -12,7 +12,7 @@ O projeto implementa o fluxo de autenticação e possui um frontend React integr
 
 - Node.js e Express
 - ES Modules (`import` e `export`)
-- Prisma ORM e MySQL
+- Prisma ORM e SQLite
 - bcrypt
 - jsonwebtoken (JWT)
 - dotenv
@@ -22,19 +22,21 @@ O projeto implementa o fluxo de autenticação e possui um frontend React integr
 ## 3. Estrutura de pastas
 
 ```text
-src/
-├── controllers/
-│   ├── authController.js
-│   └── userController.js
-├── middlewares/
-│   └── authMiddleware.js
-├── routes/
-│   ├── authRoutes.js
-│   └── userRoutes.js
-├── prismaClient.js
-├── app.js
-└── server.js
-prisma/
+backend/
+├── package.json
+└── src/
+  ├── controllers/
+  │   ├── authController.js
+  │   └── userController.js
+  ├── middlewares/
+  │   └── authMiddleware.js
+  ├── routes/
+  │   ├── authRoutes.js
+  │   └── userRoutes.js
+  ├── prismaClient.js
+  ├── app.js
+  └── server.js
+backend/prisma/
 ├── schema.prisma
 └── seed.js
 .env.example
@@ -45,7 +47,7 @@ README.md
 
 ## 4. Como instalar as dependências
 
-Tenha o Node.js e um servidor MySQL instalados. No terminal, dentro da pasta do projeto, execute:
+Tenha o Node.js instalado. No terminal, dentro da pasta do projeto, execute:
 
 ```bash
 npm install
@@ -61,10 +63,10 @@ cp .env.example .env
 
 No PowerShell, se `cp` não funcionar, use `Copy-Item .env.example .env`.
 
-Depois, abra o `.env` e troque usuário, senha, host e nome do banco conforme sua instalação do MySQL:
+O backend usa SQLite local por padrão, então não é necessário instalar ou iniciar um servidor de banco. Configure `backend/.env`:
 
 ```env
-DATABASE_URL="mysql://usuario:senha@localhost:3306/template_auth_tcc"
+DATABASE_URL="file:./dev.db"
 JWT_SECRET="troque_essa_chave"
 JWT_EXPIRES_IN="1d"
 PORT=3000
@@ -74,10 +76,10 @@ O arquivo `.env` contém dados privados e não deve ser enviado ao Git. O `.env.
 
 ## 6. Como criar o banco com Prisma
 
-Com o MySQL funcionando e o `.env` configurado, execute:
+Com o `.env` configurado, execute:
 
 ```bash
-npx prisma migrate dev --name init
+npx prisma migrate dev --schema=backend/prisma/schema.prisma --name init
 ```
 
 Esse comando cria as tabelas descritas em `prisma/schema.prisma` e gera o Prisma Client.
@@ -85,7 +87,7 @@ Esse comando cria as tabelas descritas em `prisma/schema.prisma` e gera o Prisma
 ## 7. Como rodar o seed
 
 ```bash
-npx prisma db seed
+npx prisma db seed --schema=backend/prisma/schema.prisma
 ```
 
 O seed cria ou atualiza este usuário de teste:
@@ -98,6 +100,7 @@ A senha não é salva pura: o seed usa o bcrypt para gerar seu hash.
 ## 8. Como iniciar o servidor
 
 ```bash
+cd backend
 npm run dev
 ```
 

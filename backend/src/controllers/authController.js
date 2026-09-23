@@ -1,58 +1,60 @@
-// Estas bibliotecas serão usadas quando os TODOs forem completados em aula.
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../prismaClient.js";
 
+const jwtSecret = process.env.JWT_SECRET || "troque_essa_chave";
+
+function normalizeEmail(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
 export async function register(req, res) {
   try {
-    const { name, email, password } = req.body;
+    const name = String(req.body?.name ?? "").trim();
+    const email = normalizeEmail(req.body?.email);
+    const password = String(req.body?.password ?? "");
 
     if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Nome, email e senha são obrigatórios"
+        message: "Nome, email e senha são obrigatórios",
       });
     }
 
-    // TODO: verificar se já existe usuário com este email
-    // Dica: use prisma.user.findUnique e o campo email.
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "A senha deve ter pelo menos 6 caracteres",
+      });
+    }
 
     const usuarioExiste = await prisma.user.findUnique({
       where: {
-        email: email
-      }
+        email,
+      },
     });
 
     if (usuarioExiste) {
       return res.status(400).json({
-        message: "E-mail já cadastrado"
+        message: "E-mail já cadastrado",
       });
     }
 
-    // TODO: gerar o hash da senha usando bcrypt.hash
-    // Dica: não salve a variável password diretamente no banco.
-
     const senhaHash = await bcrypt.hash(password, 10);
-
-    // TODO: salvar o usuário no banco com a senha hasheada
-    // Dica: use prisma.user.create.
 
     const usuario = await prisma.user.create({
       data: {
-        name: name,
-        email: email,
-        password: senhaHash
-      }
+        name,
+        email,
+        password: senhaHash,
+      },
     });
-
-    // TODO: retornar os dados do usuário sem a senha
 
     return res.status(201).json({
       message: "Usuário cadastrado com sucesso",
       usuario: {
         id: usuario.id,
         name: usuario.name,
-        email: usuario.email
-      }
+        email: usuario.email,
+      },
     });
   } catch (error) {
     console.error("Erro no cadastro:", error);
@@ -62,61 +64,49 @@ export async function register(req, res) {
 
 export async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const email = normalizeEmail(req.body?.email);
+    const password = String(req.body?.password ?? "");
 
     if (!email || !password) {
       return res.status(400).json({
-        message: "Email e senha são obrigatórios"
+        message: "Email e senha são obrigatórios",
       });
     }
 
-    // TODO: buscar usuário pelo email
-    // Dica: use prisma.user.findUnique.
-
     const usuario = await prisma.user.findUnique({
       where: {
-        email: email
-      }
+        email,
+      },
     });
 
     if (!usuario) {
       return res.status(401).json({
-        message: "E-mail ou senha inválidos"
+        message: "E-mail ou senha inválidos",
       });
     }
-
-    // TODO: comparar a senha digitada com o hash salvo no banco
-    // Dica: use bcrypt.compare.
 
     const senhaValida = await bcrypt.compare(password, usuario.password);
 
     if (!senhaValida) {
       return res.status(401).json({
-        message: "E-mail ou senha inválidos"
+        message: "E-mail ou senha inválidos",
       });
     }
 
-    // Neste projeto, o token funciona como uma sessão.
-    // Depois do login, o usuário envia esse token para provar que está autenticado.
-
     const token = jwt.sign(
-      {
-        id: usuario.id
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN
-      }
+      { id: usuario.id },
+      jwtSecret,
+      { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
     );
 
     return res.status(200).json({
       message: "Login realizado com sucesso",
-      token: token,
+      token,
       usuario: {
         id: usuario.id,
         name: usuario.name,
-        email: usuario.email
-      }
+        email: usuario.email,
+      },
     });
   } catch (error) {
     console.error("Erro no login:", error);
